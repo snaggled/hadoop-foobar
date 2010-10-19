@@ -1,12 +1,3 @@
----
-layout: post
-title: Fun with MapReduce and Hadoop (Calculating Stock Market Statistics in a Parallel Fashion)
----
-
-h2. <a href="{{ page.url }}">{{ page.title }}</a>
-
-19 Oct 2010 - Denver, CO
-
 <div id="post-1" class="post">
 <div class="entry">
  
@@ -28,7 +19,7 @@ h3. Introducing Apache Hadoop/MapReduce
 
 "Hadoop MapReduce":http://hadoop.apache.org/mapreduce/ is Apaches open source framework for supporting this paradigm. Once installed, we'll need a project to test out its capabilities. Lets write a task to compute the frequency of stock market changes. For example, given a particular stock, we'd like to know how often in the past several years its changed by 1%, 2%, 3% etc (kind of like a a Fourier Transform, or transforming some temporal domain data into the frequency domain). This is typical of the type of processing the MapReduce framework should be good at.
 
-I've added to code for this example to "github":sdfsdfsdf but the core of it is that we're going to need a couple of things to get started. The first ones a dataset. Yahoo Finance can provide what we need through the following webservices call:
+I've added to code for this example to "github":http://github.com/snaggled/hadoop-foobar but the core of it is that we're going to need a couple of things to get started. The first ones a dataset. Yahoo Finance can provide what we need through the following webservices call:
 
 <pre class='brush:bash,gutter:false'> 
 	wget http://ichart.finance.yahoo.com/table.csv?s=BP
@@ -114,6 +105,6 @@ h4. Out Output
              
 That was actually pretty painless. I've been thinking about Arthur C. Clarkes "Nine Billion Names of God":http://www.fantasticfiction.co.uk/c/arthur-c-clarke/nine-billion-names-of-god.htm short Science Fiction story and think MapReduce (actually probably more-so the Map part, less the Reduce part) may be a good platform to do some experimentation on regarding that story.
 
-The source for this example can be found "here":
+The source for this example can be found "here":http://github.com/snaggled/hadoop-foobar
 </div>
 </div>
