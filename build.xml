@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<project name="foobar" basedir="." default="build">
+    <property name="src" value="src"/>
+    <property name="classes" value="classes"/>
+    <property name="input" value="input"/>
+    <property name="output" value="output"/>
+    <property name="outputjar" value="foobar.jar"/>
+    <property name="execdir" value="."/>
+    <property name="exec" value="../../bin/hadoop"/>
+    <property name="wget" value="wget"/>
+
+    <target name="compile" depends="create">
+        <javac destdir="${classes}">            
+            <src path="${src}"/>            
+            <classpath refid="java"/>
+        </javac>
+    </target>
+               
+	
+    <target name="fetch_data" depends="createinput">
+		<exec dir="${input}" executable="${wget}">
+			<arg value="http://ichart.finance.yahoo.com/table.csv?s=BP"/>
+		</exec>
+	</target>
+	
+  	<target name="run" depends="cleanoutput">
+		<exec dir="${execdir}" executable="${exec}">
+			<arg line="jar foobar.jar com.packetnode.FooBar ${input} ${output}"/>
+		</exec>
+	</target>
+	
+	<target name="build" depends="jar"/>
+	
+    <target name="jar" depends="compile">
+        <jar destfile="${outputjar}">
+            <fileset dir="${classes}"/>
+        </jar>
+    </target>
+
+    <target name="cleaninput">
+        <delete dir="${input}"/>
+    </target>
+
+    <target name="cleanoutput">
+        <delete dir="${output}"/>
+    </target>
+
+    <target name="clean" depends="cleanoutput">
+        <delete dir="${classes}"/>
+        <delete dir="${output}"/>
+    </target>
+
+    <target name="createinput" depends="cleaninput">
+        <mkdir dir="${input}"/>
+    </target>
+
+    <target name="create" depends="clean">
+        <mkdir dir="${classes}"/>
+    </target>
+
+    <path id="java">
+        <fileset dir="../../">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+</project>

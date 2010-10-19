@@ -1,0 +1,119 @@
+---
+layout: post
+title: Fun with MapReduce and Hadoop (Calculating Stock Market Statistics in a Parallel Fashion)
+---
+
+h2. <a href="{{ page.url }}">{{ page.title }}</a>
+
+19 Oct 2010 - Denver, CO
+
+<div id="post-1" class="post">
+<div class="entry">
+ 
+Epic summer. Lots of camping, bbq, boating and drinking great Colorado microbrews. Really can't complain. Fall coming in means my mind is wandering to some more abstract problems, and one of the things on my list was to look at "MapReduce":http://en.wikipedia.org/wiki/MapReduce. The new "Autechre":http://www.autechre.ws/move-of-ten/ album seems fitting background music to this type of endeavor.
+                                              
+<br/><img class="centered" src="http://ecx.images-amazon.com/images/I/51XCBZHZyQL._SS500_.jpg" alt="Move Of Ten"/>  
+
+This isn't the place for an in-depth tutorial of MapReduce (of which there are many excellent ones - I recommend "this paper":http://labs.google.com/papers/mapreduce-osdi04.pdf from google and the following video from Cloudera.)      
+
+<center>      
+	<br/>
+	<iframe src="http://player.vimeo.com/video/3584536" width="400" height="300" frameborder="0"></iframe>
+	<br/>
+</center>     
+
+The short of it is that MapReduce is a paradigm that abstracts a lot of the complications that we typically face when attempting process large amounts of data in a parallel fashion. And by complications, I mean primarily scheduling, reliability, infrastructure and distribution. In effect, you end up programming to a particular abstraction or Design Pattern and not worrying about the rest of it. Of course, there are certain requirements necessary to make the best of this paradigm - in short its well suited to processing non-interactive lists of data with little or no data-dependency. Sounds like fun ? On to an example!  
+
+h3. Introducing Apache Hadoop/MapReduce
+
+"Hadoop MapReduce":http://hadoop.apache.org/mapreduce/ is Apaches open source framework for supporting this paradigm. Once installed, we'll need a project to test out its capabilities. Lets write a task to compute the frequency of stock market changes. For example, given a particular stock, we'd like to know how often in the past several years its changed by 1%, 2%, 3% etc (kind of like a a Fourier Transform, or transforming some temporal domain data into the frequency domain). This is typical of the type of processing the MapReduce framework should be good at.
+
+I've added to code for this example to "github":sdfsdfsdf but the core of it is that we're going to need a couple of things to get started. The first ones a dataset. Yahoo Finance can provide what we need through the following webservices call:
+
+<pre class='brush:bash,gutter:false'> 
+	wget http://ichart.finance.yahoo.com/table.csv?s=BP
+</pre>              
+ 
+I've chosen BP as a stock because they are fresh in my mind given I bought in at $42 (on the way down) and its taken some time to get back into the black. Our input data should thus look like this:      
+
+<pre class='brush:bash,gutter:false'> 
+2010-10-18,40.66,41.74,40.44,41.49,10620000,41.49
+2010-10-15,40.92,41.11,40.40,40.62,9023100,40.62
+2010-10-14,41.15,41.37,40.96,41.02,6750300,41.02
+2010-10-13,41.40,41.75,41.25,41.41,6950200,41.41
+2010-10-12,40.74,41.53,40.55,41.26,8343100,41.26
+</pre>
+
+So we have out input, the next thing we need to write is a _Map_ function and a _Reduce_ function. 
+
+h4. Map Function
+
+Primarily we are writing a stream processor here that atomically performs what needs to happen on one line of data. Thats perfect for us, we're going to simply take the opening price, the closing price, calculate the percent change and spit it out. As follows:
+
+<pre class='brush:java,gutter:false'> 
+// Date,Open,High,Low,Close,Volume,Adj Close
+String[] tokens = value.toString().split(",");  
+float open = Float.valueOf(tokens[1]);
+float close = Float.valueOf(tokens[4]);
+float change = ((close - open)/open) * 100;   
+word.set(new DecimalFormat("0.##").format((double) change) + "%");
+context.write(word, one);
+</pre>
+
+What thats going to give is us a stream of (name, value) pairs with the name being the percentage change for the day and the value being the integer '1'. Thats ok, thats all we need from our mapping function. This function can be distributed over X number of machines, each one performing its streaming function in parallel and independent of the others.
+
+h4. Reduce Function
+                        
+Next up is the 'Reduce' function (hence the name of the paradigm). What's going to take place here is that a reduce function is going to take the (name, value) outputs from all the mappers and process that data accordingly (often 'reducing' it). In our case we are simply going to count the number of times a particular percentage change happens. In essence we are going to change this:
+
+
+<pre class='brush:bash,gutter:false'> 
+1.2% 1
+1.3% 1
+1.2% 1
+</pre>
+
+into:
+
+<pre class='brush:bash,gutter:false'> 
+1.2% 2
+1.3% 1
+</pre>              
+       
+There's not much to the code:
+
+<pre class='brush:java,gutter:false'> 
+int sum = 0;
+for (IntWritable val : values) {
+	sum += val.get();
+}
+context.write(key, new IntWritable(sum));
+</pre>                                        
+                          
+Thats about it, we write 2 functions and theres some setup involved (which I've embedded into the "ant":http://ant.apache.org/ build.xml in the repository).
+
+h4. Out Output
+    
+<pre class='brush:bash,gutter:false'> 
+-0.01%  2
+-0.02%  13
+-0.03%  12
+-0.04%  10
+-0.05%  14
+-0.06%  17
+-0.07%  19
+-0.08%  12
+-0.09%  12
+-0.1%   19
+-0.11%  18
+-0.12%  18
+-0.13%  20
+-0.14%  27
+-0.15%  43
+</pre>
+             
+That was actually pretty painless. I've been thinking about Arthur C. Clarkes "Nine Billion Names of God":http://www.fantasticfiction.co.uk/c/arthur-c-clarke/nine-billion-names-of-god.htm short Science Fiction story and think MapReduce (actually probably more-so the Map part, less the Reduce part) may be a good platform to do some experimentation on regarding that story.
+
+The source for this example can be found "here":
+</div>
+</div>
