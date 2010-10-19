@@ -5,13 +5,7 @@ Epic summer. Lots of camping, bbq, boating and drinking great Colorado microbrew
                                               
 <br/><img class="centered" src="http://ecx.images-amazon.com/images/I/51XCBZHZyQL._SS500_.jpg" alt="Move Of Ten"/>  
 
-This isn't the place for an in-depth tutorial of MapReduce (of which there are many excellent ones - I recommend "this paper":http://labs.google.com/papers/mapreduce-osdi04.pdf from google and the following video from Cloudera.)      
-
-<center>      
-	<br/>
-	<iframe src="http://player.vimeo.com/video/3584536" width="400" height="300" frameborder="0"></iframe>
-	<br/>
-</center>     
+This isn't the place for an in-depth tutorial of MapReduce (of which there are many excellent ones - I recommend "this paper":http://labs.google.com/papers/mapreduce-osdi04.pdf from google.
 
 The short of it is that MapReduce is a paradigm that abstracts a lot of the complications that we typically face when attempting process large amounts of data in a parallel fashion. And by complications, I mean primarily scheduling, reliability, infrastructure and distribution. In effect, you end up programming to a particular abstraction or Design Pattern and not worrying about the rest of it. Of course, there are certain requirements necessary to make the best of this paradigm - in short its well suited to processing non-interactive lists of data with little or no data-dependency. Sounds like fun ? On to an example!  
 
