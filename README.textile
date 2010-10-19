@@ -105,6 +105,6 @@ h4. Out Output
              
 That was actually pretty painless. I've been thinking about Arthur C. Clarkes "Nine Billion Names of God":http://www.fantasticfiction.co.uk/c/arthur-c-clarke/nine-billion-names-of-god.htm short Science Fiction story and think MapReduce (actually probably more-so the Map part, less the Reduce part) may be a good platform to do some experimentation on regarding that story.
 
-The source for this example can be found "here":http://github.com/snaggled/hadoop-foobar
+The source for this example can be found "here":http://github.com/snaggled/hadoop-foobar. It should be placed in a subdir of the hadoop installation, i.e. jobs/hadoop-foobar.
 </div>
 </div>
